@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+    <android.support.v7.widget.CardView
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/card_view"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:background="?android:attr/selectableItemBackground"
+        card_view:cardCornerRadius="4dp"
+        card_view:cardMaxElevation="12dp"
+
+        >
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        <ImageView
+        android:id="@+id/showImg"
+        android:layout_width="120dp"
+        android:layout_height="match_parent" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_toRightOf="@id/showImg"
+            android:padding="12dp"
+            >
+
+        <TextView
+            android:id="@+id/showTitle"
+            android:text="Show Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            />
+        <TextView
+            android:id="@+id/showNetwork"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/showTitle"
+            android:text="NBC"
+            />
+        <TextView
+            android:id="@+id/showTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:text="7:00 PM EST"
+            />
+        <TextView
+            android:id="@+id/chatter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:text="CHATTER"
+            />
+
+
+        </RelativeLayout>
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
