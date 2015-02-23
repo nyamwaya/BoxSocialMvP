@@ -12,4 +12,8 @@
 
     <string name="action_settings">Settings</string>
     <string name="action_search">search</string>
+    <string name="custom_search_api_key">AIzaSyACEYoTD45Ik7gs-bIRUDwdQvLWlj8m28w</string>
+    <string name="custom_search_id">004389112705324848757:svsesky9sfs</string>
+
+
 </resources>

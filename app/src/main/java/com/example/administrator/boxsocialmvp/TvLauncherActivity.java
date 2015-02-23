@@ -1,32 +1,39 @@
 package com.example.administrator.boxsocialmvp;
 
 import android.app.Activity;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
-import android.view.Gravity;
+import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
+
+import com.example.administrator.boxsocialmvp.Networking.ImageSearchApi;
+import com.example.administrator.boxsocialmvp.Networking.TvRageApiService;
+import com.example.administrator.boxsocialmvp.Objects.Image;
+import com.example.administrator.boxsocialmvp.Objects.TvShow;
+import com.google.api.client.googleapis.GoogleUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit.Callback;
+import retrofit.RestAdapter;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 
 public class TvLauncherActivity extends ActionBarActivity
@@ -39,11 +46,82 @@ public class TvLauncherActivity extends ActionBarActivity
 
     private RecyclerView rcview;
 
+    public static final String SHOW_ENDPOINT = "https://api.myjson.com" ;
+    public static final String GOOGLE_ENDPOINT = "https://www.googleapis.com" ;
+
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
     private CharSequence mTitle;
     private ShowAdapter adapter;
+    final List<TvCard> data = new ArrayList<>();
+    final List<Image> image = new ArrayList<>();
+
+    public void requestImage(String imageSearch) {
+        RestAdapter restAdapter = new RestAdapter.Builder()
+                .setEndpoint(GOOGLE_ENDPOINT)
+                .build();
+        ImageSearchApi searchApi = restAdapter.create(ImageSearchApi.class);
+        searchApi.getImages(getResources().getString(R.string.custom_search_api_key),
+                getResources().getString(R.string.custom_search_id),
+                imageSearch,
+
+        new Callback<List<Image>>() {
+            @Override
+            public void success(List<Image> images, Response response) {
+                Image img = images.get(0);
+                Image imgPojo = new Image();
+                if(img.getLink()!=null && !img.getLink().equalsIgnoreCase("")) {
+                    imgPojo.setLink(img.getLink());
+                    TvLauncherActivity.this.image.add(imgPojo);
+
+                }
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                error.printStackTrace();
+                Log.e("GOOGLE ERROR", error.getMessage());
+            }
+        });
+    }
+
+    public void requestData(){
+        RestAdapter restAdapter = new RestAdapter.Builder()
+                .setEndpoint(SHOW_ENDPOINT)
+                .build();
+        TvRageApiService apiService = restAdapter.create(TvRageApiService.class);
+
+        apiService.getShows(new Callback<List<TvShow>>() {
+            @Override
+            public void success(List<TvShow> tvShows, Response response) {
+                for(int i=0; i<tvShows.size(); i++){
+                    TvShow show = tvShows.get(i);
+                    TvCard currentCard = new TvCard();
+
+                    if(!show.getEpisodeTitle().equalsIgnoreCase("To be announced")) {
+                        Log.e("ShowsDATA: ",show.getEpisodeTitle());
+                        currentCard.showTitle = show.getEpisodeTitle();
+                        currentCard.network = show.getLogoFilename();
+                        currentCard.showTime = show.getListDateTime();
+                        currentCard.chatter = "CHATTER";
+                        data.add(currentCard);
+                        requestImage(show.getEpisodeTitle()+" poster");
+                    }
+
+               }
+
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+
+            }
+        });
+
+    }
+
+
 
     public static List<TvCard> getSampleData(){
         List<TvCard> sampleData = new ArrayList<>();
@@ -79,9 +157,14 @@ public class TvLauncherActivity extends ActionBarActivity
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
         mTitle = getTitle();
         rcview = (RecyclerView) findViewById(R.id.show_list);
-        adapter = new ShowAdapter(this,getSampleData());
-        rcview.setAdapter(adapter);
-        rcview.setLayoutManager(new LinearLayoutManager(this));
+        try {
+            requestData();
+        } finally {
+            adapter = new ShowAdapter(TvLauncherActivity.this,data,image);
+            rcview.setAdapter(adapter);
+            rcview.setLayoutManager(new LinearLayoutManager(TvLauncherActivity.this));
+
+        }
 
         Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar);
         mToolbar.setTitle("");

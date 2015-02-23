@@ -1,6 +1,7 @@
 package com.example.administrator.boxsocialmvp;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.administrator.boxsocialmvp.Objects.Image;
 import com.squareup.picasso.Picasso;
 
 import java.util.Collections;
@@ -22,11 +24,15 @@ public class ShowAdapter extends RecyclerView.Adapter<ShowAdapter.MyViewholder> 
     private final LayoutInflater inflator;
     private final Context context;
     List<TvCard> tvCards = Collections.emptyList();
+    List<Image> images = Collections.emptyList();
 
-    public ShowAdapter(Context context, List<TvCard> tvCards) {
+    String LOGO_ENDPOINT = "http://cdn.tvpassport.com/image/station/100x100/";
+
+    public ShowAdapter(Context context, List<TvCard> tvCards, List<Image> image) {
         inflator = LayoutInflater.from(context);
         this.context = context;
         this.tvCards = tvCards;
+        this.images = image;
     }
 
     @Override
@@ -40,12 +46,14 @@ public class ShowAdapter extends RecyclerView.Adapter<ShowAdapter.MyViewholder> 
     @Override
     public void onBindViewHolder(MyViewholder myViewholder, int position) {
         TvCard current = tvCards.get(position);
+        Image poster = images.get(position);
         myViewholder.showtitle.setText(current.showTitle);
         myViewholder.showtime.setText(current.showTime);
         myViewholder.showNetwork.setText(current.network);
         myViewholder.chatter.setText(current.chatter);
-        Log.e("SHOWADAPTER","ImgUrl:"+current.previewImg);
-        Picasso.with(context).load(current.previewImg).error(R.drawable.ic_book_black_48dp).into(myViewholder.showImg);
+        myViewholder.chatter.setTextColor(Color.parseColor("#FFA500"));
+        Log.e("SHOWADAPTER","ImgUrl:"+poster.getLink());
+        Picasso.with(context).load(poster.getLink()).error(R.drawable.ic_book_black_48dp).into(myViewholder.showImg);
 
 
     }
