@@ -14,6 +14,9 @@
     <string name="action_search">search</string>
     <string name="custom_search_api_key">AIzaSyACEYoTD45Ik7gs-bIRUDwdQvLWlj8m28w</string>
     <string name="custom_search_id">004389112705324848757:svsesky9sfs</string>
+    <string name="imdb_key_id">28250b22974cabd0d98c08a36ec12ddb</string>
+    <string name="seen_key_id">6940991118</string>
+
 
 
 </resources>

@@ -1,7 +1,6 @@
 package com.example.administrator.boxsocialmvp;
 
 import android.app.Activity;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.support.v7.app.ActionBarActivity;
@@ -20,12 +19,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
+import android.widget.Switch;
 
+import com.example.administrator.boxsocialmvp.Networking.AiringToday;
 import com.example.administrator.boxsocialmvp.Networking.ImageSearchApi;
-import com.example.administrator.boxsocialmvp.Networking.TvRageApiService;
+import com.example.administrator.boxsocialmvp.Networking.OnTheAir;
+import com.example.administrator.boxsocialmvp.Networking.PopularApi;
+import com.example.administrator.boxsocialmvp.Networking.TopRatedShowsApi;
+import com.example.administrator.boxsocialmvp.Objects.BoxSocialConstants;
 import com.example.administrator.boxsocialmvp.Objects.Image;
 import com.example.administrator.boxsocialmvp.Objects.TvShow;
-import com.google.api.client.googleapis.GoogleUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +42,7 @@ import retrofit.client.Response;
 public class TvLauncherActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
+    private final String TAG = this.getClass().getSimpleName();
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
@@ -46,7 +50,7 @@ public class TvLauncherActivity extends ActionBarActivity
 
     private RecyclerView rcview;
 
-    public static final String SHOW_ENDPOINT = "https://api.myjson.com" ;
+    public static final String SHOW_ENDPOINT = "http://api.themoviedb.org/3" ;
     public static final String GOOGLE_ENDPOINT = "https://www.googleapis.com" ;
 
     /**
@@ -56,6 +60,7 @@ public class TvLauncherActivity extends ActionBarActivity
     private ShowAdapter adapter;
     final List<TvCard> data = new ArrayList<>();
     final List<Image> image = new ArrayList<>();
+    private int selectedItem = 1;
 
     public void requestImage(String imageSearch) {
         RestAdapter restAdapter = new RestAdapter.Builder()
@@ -86,41 +91,109 @@ public class TvLauncherActivity extends ActionBarActivity
         });
     }
 
-    public void requestData(){
+    public void requestData(int i){
         RestAdapter restAdapter = new RestAdapter.Builder()
                 .setEndpoint(SHOW_ENDPOINT)
                 .build();
-        TvRageApiService apiService = restAdapter.create(TvRageApiService.class);
 
-        apiService.getShows(new Callback<List<TvShow>>() {
-            @Override
-            public void success(List<TvShow> tvShows, Response response) {
-                for(int i=0; i<tvShows.size(); i++){
-                    TvShow show = tvShows.get(i);
-                    TvCard currentCard = new TvCard();
+        PopularApi apiService = restAdapter.create(PopularApi.class);
+        switch (i){
+            case 1:
 
-                    if(!show.getEpisodeTitle().equalsIgnoreCase("To be announced")) {
-                        Log.e("ShowsDATA: ",show.getEpisodeTitle());
-                        currentCard.showTitle = show.getEpisodeTitle();
-                        currentCard.network = show.getLogoFilename();
-                        currentCard.showTime = show.getListDateTime();
-                        currentCard.chatter = "CHATTER";
-                        data.add(currentCard);
-                        requestImage(show.getEpisodeTitle()+" poster");
-                    }
+                apiService.getShows(getResources().getString(R.string.imdb_key_id),
+                        "1",
+                        new Callback<TvShow>() {
+                            @Override
+                            public void success(TvShow tvShows, Response response) {
+                                loopData(tvShows);
+                            }
 
-               }
+                            @Override
+                            public void failure(RetrofitError error) {
+                                Log.e(TAG, error.toString());
+                            }
+                        });
+                break;
+            case 2:
+                apiService.getTopShows(getResources().getString(R.string.imdb_key_id),
+                        "1",
+                        new Callback<TvShow>() {
+                            @Override
+                            public void success(TvShow tvShows, Response response) {
+                                loopData(tvShows);
+                            }
 
-            }
+                            @Override
+                            public void failure(RetrofitError error) {
+                                Log.e(TAG, error.toString());
+                            }
+                        });
+                break;
+            case 3:
+                apiService.getOnTheAirShows(getResources().getString(R.string.imdb_key_id),
+                        "1",
+                        new Callback<TvShow>() {
+                            @Override
+                            public void success(TvShow tvShows, Response response) {
+                                loopData(tvShows);
+                            }
 
-            @Override
-            public void failure(RetrofitError error) {
+                            @Override
+                            public void failure(RetrofitError error) {
+                                Log.e(TAG, error.toString());
+                            }
+                        });
+                break;
+            case 4:
+                apiService.getAiringShows(getResources().getString(R.string.imdb_key_id),
+                        "1",
+                        new Callback<TvShow>() {
+                            @Override
+                            public void success(TvShow tvShows, Response response) {
+                                loopData(tvShows);
+                            }
 
-            }
-        });
+                            @Override
+                            public void failure(RetrofitError error) {
+                                Log.e(TAG, error.toString());
+                            }
+                        });
+                break;
+            default:
+                apiService.getShows(getResources().getString(R.string.imdb_key_id),
+                        "1",
+                        new Callback<TvShow>() {
+                            @Override
+                            public void success(TvShow tvShows, Response response) {
+                                loopData(tvShows);
+                            }
+                            @Override
+                            public void failure(RetrofitError error) {
+                                Log.e(TAG, error.toString());
+                            }
+                        });
+                break;
+
+        }
+
+
 
     }
 
+    private void loopData(TvShow tvShows) {
+        data.clear();
+        for(int i=0; i<tvShows.getResults().size(); i++){
+            TvShow.Result show = tvShows.getResults().get(i);
+                TvCard currentCard = new TvCard();
+                Log.e("ShowsDATA: ", show.getName());
+                currentCard.showTitle = show.getName();
+                currentCard.chatter = "CHATTER";
+                currentCard.previewImg = show.getPosterPath();
+                currentCard.bannerImg = show.getBackdropPath();
+                data.add(currentCard);
+
+       }
+    }
 
 
     public static List<TvCard> getSampleData(){
@@ -158,9 +231,9 @@ public class TvLauncherActivity extends ActionBarActivity
         mTitle = getTitle();
         rcview = (RecyclerView) findViewById(R.id.show_list);
         try {
-            requestData();
+            requestData(selectedItem);
         } finally {
-            adapter = new ShowAdapter(TvLauncherActivity.this,data,image);
+            adapter = new ShowAdapter(TvLauncherActivity.this,data);
             rcview.setAdapter(adapter);
             rcview.setLayoutManager(new LinearLayoutManager(TvLauncherActivity.this));
 
@@ -189,6 +262,7 @@ public class TvLauncherActivity extends ActionBarActivity
     @Override
     public void onNavigationDrawerItemSelected(int position) {
         // update the main content by replacing fragments
+        selectedItem = position;
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
@@ -196,16 +270,29 @@ public class TvLauncherActivity extends ActionBarActivity
     }
 
     public void onSectionAttached(int number) {
+        BoxSocialConstants.setTvApiPath(number);
         switch (number) {
             case 1:
                 mTitle = getString(R.string.title_section1);
+                requestData(number);
+                adapter.notifyDataSetChanged();
+
                 break;
             case 2:
                 mTitle = getString(R.string.title_section2);
+                requestData(number);
+                adapter.notifyDataSetChanged();
+
+
+
                 break;
             case 3:
                 mTitle = getString(R.string.title_section3);
+                requestData(number);
+                adapter.notifyDataSetChanged();
+
                 break;
+
         }
     }
 

@@ -15,7 +15,7 @@ import retrofit.http.Query;
 public interface ImageSearchApi {
 
 
-    @GET("/customsearch/v1?")
+    @GET("/customsearch/v1")
     public void getImages(
             @Query("key") String key,
             @Query("cx") String customId,

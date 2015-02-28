@@ -1,13 +1,16 @@
 package com.example.administrator.boxsocialmvp;
 
+import java.io.Serializable;
+
 /**
  * Created by Administrator on 2/21/2015.
  */
-public class TvCard {
+public class TvCard implements Serializable {
 
-    String previewImg;
-    String showTime;
-    String network;
-    String showTitle;
-    String chatter;
+    public String previewImg;
+    public String bannerImg;
+    public String showTime;
+    public String network;
+    public String showTitle;
+    public String chatter;
 }

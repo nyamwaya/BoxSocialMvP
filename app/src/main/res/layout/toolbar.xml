@@ -9,6 +9,7 @@
         android:layout_height="match_parent"
        >
     <TextView
+        android:id="@+id/title_text"
         android:text="Friday 2/20/2015"
         android:textAppearance="@android:style/TextAppearance.Theme"
         android:textColor="@android:color/white"
