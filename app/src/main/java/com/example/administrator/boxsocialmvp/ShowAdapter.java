@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.example.administrator.boxsocialmvp.Adapters.SocialAdapter;
 import com.example.administrator.boxsocialmvp.Objects.Image;
+import com.example.administrator.boxsocialmvp.Utils.IntentUtils;
 import com.squareup.picasso.Picasso;
 
 import java.util.Collections;
@@ -24,13 +25,13 @@ import java.util.List;
 public class ShowAdapter extends RecyclerView.Adapter<ShowAdapter.MyViewholder> {
 
     private final LayoutInflater inflator;
-    private final Context context;
+    private final TvLauncherActivity context;
     List<TvCard> tvCards = Collections.emptyList();
     List<Image> images = Collections.emptyList();
 
     String IMG_ENDPOINT = "http://image.tmdb.org/t/p/w500";
 
-    public ShowAdapter(Context context, List<TvCard> tvCards) {
+    public ShowAdapter(TvLauncherActivity context, List<TvCard> tvCards) {
         inflator = LayoutInflater.from(context);
         this.context = context;
         this.tvCards = tvCards;
@@ -56,12 +57,14 @@ public class ShowAdapter extends RecyclerView.Adapter<ShowAdapter.MyViewholder> 
         myViewholder.chatter.setTextColor(Color.parseColor("#FFA500"));
         Log.e("SHOWADAPTER", "ImgUrl:" + current.previewImg);
         Picasso.with(context).load(IMG_ENDPOINT +current.previewImg).error(R.drawable.ic_book_black_48dp).into(myViewholder.showImg);
+        Picasso.with(context).load(IMG_ENDPOINT +current.bannerImg).into(myViewholder.bannerImg);
         myViewholder.chatter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context,SocialActivity.class);
                 intent.putExtra("show",current);
-                context.startActivity(intent);
+                IntentUtils.startPreviewActivity(context, intent);
+//                context.overridePendingTransition(R.anim.in_from_right,R.anim.out_to_left);
             }
         });
 
@@ -79,6 +82,7 @@ public class ShowAdapter extends RecyclerView.Adapter<ShowAdapter.MyViewholder> 
         TextView showNetwork;
         TextView chatter;
         ImageView showImg;
+        ImageView bannerImg;
 
         public MyViewholder(View itemView) {
             super(itemView);
@@ -87,6 +91,7 @@ public class ShowAdapter extends RecyclerView.Adapter<ShowAdapter.MyViewholder> 
             showNetwork = (TextView) itemView.findViewById(R.id.showNetwork);
             chatter = (TextView) itemView.findViewById(R.id.chatter);
             showImg = (ImageView) itemView.findViewById(R.id.showImg);
+            bannerImg = (ImageView) itemView.findViewById(R.id.bannerImg);
 
         }
     }

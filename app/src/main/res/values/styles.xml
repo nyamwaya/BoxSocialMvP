@@ -35,5 +35,38 @@
         <item name="color">@android:color/white</item>
     </style>
 
+    <!--RATING BAR STYLE -->
+    <!-- SMALL -->
+    <style name="RatingStar_Small" parent="@android:style/Widget.RatingBar">
+        <item name="android:indeterminateOnly">false</item>
+        <item name="android:progressDrawable">@drawable/rating_stars_small</item>
+        <item name="android:indeterminateDrawable">@drawable/rating_stars_small</item>
+        <item name="android:minHeight">16dip</item>
+        <item name="android:maxHeight">16dip</item>
+        <item name="android:thumb">@null</item>
+        <item name="android:isIndicator">true</item>
+    </style>
+    <!-- MEDIUM -->
+    <style name="RatingStar_Medium" parent="@android:style/Widget.RatingBar">
+        <item name="android:indeterminateOnly">false</item>
+        <item name="android:progressDrawable">@drawable/rating_stars_medium</item>
+        <item name="android:indeterminateDrawable">@drawable/rating_stars_medium</item>
+        <item name="android:minHeight">26dip</item>
+        <item name="android:maxHeight">26dip</item>
+        <item name="android:thumb">@null</item>
+        <item name="android:isIndicator">true</item>
+    </style>
+    <!-- BIG -->
+    <style name="RatingStar_Big" parent="@android:style/Widget.RatingBar">
+        <item name="android:indeterminateOnly">false</item>
+        <item name="android:progressDrawable">@drawable/rating_stars_big</item>
+        <item name="android:indeterminateDrawable">@drawable/rating_stars_big</item>
+        <item name="android:minHeight">48dip</item>
+        <item name="android:maxHeight">48dip</item>
+        <item name="android:thumb">@null</item>
+        <item name="android:isIndicator">true</item>
+    </style>
+
+
 
 </resources>

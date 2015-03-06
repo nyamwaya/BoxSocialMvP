@@ -1,6 +1,7 @@
 package com.example.administrator.boxsocialmvp;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.support.v7.app.ActionBarActivity;
@@ -20,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
 import android.widget.Switch;
+import android.widget.TextView;
 
 import com.example.administrator.boxsocialmvp.Networking.AiringToday;
 import com.example.administrator.boxsocialmvp.Networking.ImageSearchApi;
@@ -53,14 +55,13 @@ public class TvLauncherActivity extends ActionBarActivity
     public static final String SHOW_ENDPOINT = "http://api.themoviedb.org/3" ;
     public static final String GOOGLE_ENDPOINT = "https://www.googleapis.com" ;
 
-    /**
-     * Used to store the last screen title. For use in {@link #restoreActionBar()}.
-     */
+
     private CharSequence mTitle;
     private ShowAdapter adapter;
     final List<TvCard> data = new ArrayList<>();
     final List<Image> image = new ArrayList<>();
     private int selectedItem = 1;
+    private TextView titleTop;
 
     public void requestImage(String imageSearch) {
         RestAdapter restAdapter = new RestAdapter.Builder()
@@ -98,9 +99,9 @@ public class TvLauncherActivity extends ActionBarActivity
 
         PopularApi apiService = restAdapter.create(PopularApi.class);
         switch (i){
-            case 1:
+            case 0:
 
-                apiService.getShows(getResources().getString(R.string.imdb_key_id),
+                apiService.getAiringShows(getResources().getString(R.string.imdb_key_id),
                         "1",
                         new Callback<TvShow>() {
                             @Override
@@ -114,7 +115,7 @@ public class TvLauncherActivity extends ActionBarActivity
                             }
                         });
                 break;
-            case 2:
+            case 1:
                 apiService.getTopShows(getResources().getString(R.string.imdb_key_id),
                         "1",
                         new Callback<TvShow>() {
@@ -129,7 +130,7 @@ public class TvLauncherActivity extends ActionBarActivity
                             }
                         });
                 break;
-            case 3:
+            case 2:
                 apiService.getOnTheAirShows(getResources().getString(R.string.imdb_key_id),
                         "1",
                         new Callback<TvShow>() {
@@ -144,13 +145,14 @@ public class TvLauncherActivity extends ActionBarActivity
                             }
                         });
                 break;
-            case 4:
-                apiService.getAiringShows(getResources().getString(R.string.imdb_key_id),
+            case 3:
+                apiService.getShows(getResources().getString(R.string.imdb_key_id),
                         "1",
                         new Callback<TvShow>() {
                             @Override
                             public void success(TvShow tvShows, Response response) {
                                 loopData(tvShows);
+
                             }
 
                             @Override
@@ -193,6 +195,9 @@ public class TvLauncherActivity extends ActionBarActivity
                 data.add(currentCard);
 
        }
+        if(adapter!=null){
+            adapter.notifyDataSetChanged();
+        }
     }
 
 
@@ -219,10 +224,18 @@ public class TvLauncherActivity extends ActionBarActivity
 
     }
 
+    SharedPreferences pref;
+    private static String CONSUMER_KEY = "Z5BLZfUDtxpuW1OMBa4zEsptn";
+    private static String CONSUMER_SECRET = "opLmxfZ2VCsqCNAu2Lqz0jBPj2Ls2sBJTQLchMkTrnaV3oXa1d";
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        pref = getPreferences(0);
+        SharedPreferences.Editor edit = pref.edit();
+        edit.putString("CONSUMER_KEY", CONSUMER_KEY);
+        edit.putString("CONSUMER_SECRET", CONSUMER_SECRET);
+        edit.apply();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tv_launcher);
 
@@ -240,7 +253,11 @@ public class TvLauncherActivity extends ActionBarActivity
         }
 
         Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        mToolbar.setTitle("");
+        mToolbar.setTitle(mTitle);
+
+        titleTop = (TextView) findViewById(R.id.title_text);
+        titleTop.setText(mTitle);
+
         setSupportActionBar(mToolbar);
 
         // Set up the drawer.
@@ -265,45 +282,55 @@ public class TvLauncherActivity extends ActionBarActivity
         selectedItem = position;
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
+                .replace(R.id.container, PlaceholderFragment.newInstance(position))
                 .commit();
     }
 
     public void onSectionAttached(int number) {
         BoxSocialConstants.setTvApiPath(number);
         switch (number) {
-            case 1:
+            case 0:
                 mTitle = getString(R.string.title_section1);
+                titleTop.setText(mTitle);
                 requestData(number);
-                adapter.notifyDataSetChanged();
+
+
+                break;
+            case 1:
+                mTitle = getString(R.string.title_section2);
+                titleTop.setText(mTitle);
+
+                requestData(number);
+
+
 
                 break;
             case 2:
-                mTitle = getString(R.string.title_section2);
+                mTitle = getString(R.string.title_section3);
+                titleTop.setText(mTitle);
+
                 requestData(number);
-                adapter.notifyDataSetChanged();
-
-
 
                 break;
             case 3:
-                mTitle = getString(R.string.title_section3);
+                mTitle = getString(R.string.title_section4);
+                titleTop.setText(mTitle);
+
                 requestData(number);
-                adapter.notifyDataSetChanged();
 
                 break;
 
         }
     }
 
-    public void restoreActionBar() {
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setTitle(Html.fromHtml("<font color=\"#ffffff\">" + mTitle + "</font>"));
-        actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#2A94D6")));
-
-    }
+//    public void restoreActionBar() {
+//        ActionBar actionBar = getSupportActionBar();
+//        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+//        actionBar.setDisplayShowTitleEnabled(true);
+//        actionBar.setTitle(Html.fromHtml("<font color=\"#ffffff\">" + mTitle + "</font>"));
+//        actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#2A94D6")));
+//
+//    }
 
 
 //    @Override

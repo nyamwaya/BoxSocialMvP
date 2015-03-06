@@ -1,9 +1,10 @@
 <resources>
     <string name="app_name">BoxSocialMvP</string>
 
-    <string name="title_section1">Section 1</string>
-    <string name="title_section2">Section 2</string>
-    <string name="title_section3">Section 3</string>
+    <string name="title_section1">Airing</string>
+    <string name="title_section2">Top Shows</string>
+    <string name="title_section3">On the Air</string>
+    <string name="title_section4">Popular</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -16,7 +17,7 @@
     <string name="custom_search_id">004389112705324848757:svsesky9sfs</string>
     <string name="imdb_key_id">28250b22974cabd0d98c08a36ec12ddb</string>
     <string name="seen_key_id">6940991118</string>
-
+    <string name="ok_button">OK</string>
 
 
 </resources>
