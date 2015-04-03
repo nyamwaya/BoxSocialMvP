@@ -26,11 +26,9 @@ import com.example.administrator.boxsocialmvp.Networking.PopularApi;
 import com.example.administrator.boxsocialmvp.Networking.SportsTodayApi;
 import com.example.administrator.boxsocialmvp.Objects.AllSportsToday;
 import com.example.administrator.boxsocialmvp.Objects.BoxSocialConstants;
-import com.example.administrator.boxsocialmvp.Objects.D;
-import com.example.administrator.boxsocialmvp.Objects.Example;
+import com.example.administrator.boxsocialmvp.Objects.ClassD;
 import com.example.administrator.boxsocialmvp.Objects.Image;
 import com.example.administrator.boxsocialmvp.Objects.NbaListings;
-import com.example.administrator.boxsocialmvp.Objects.TodaysSports;
 import com.example.administrator.boxsocialmvp.Objects.TvShow;
 import com.squareup.okhttp.OkHttpClient;
 
@@ -132,17 +130,17 @@ public class TvLauncherActivity extends ActionBarActivity
         RestAdapter adapter = builder.build();
         BingImageSearchApi searchApi = adapter.create(BingImageSearchApi.class);
         searchApi.getImages("'"+imageSearch+"'","json",
-                new Callback<Example>() {
+                new Callback<ClassD>() {
                     @Override
-                    public void success(Example example, Response response) {
+                    public void success(ClassD classD, Response response) {
                         Log.e(TAG,"Response: "+response.getReason());
                         Log.e(TAG,"Response Url: "+response.getUrl());
                         Log.e(TAG,"Response Status: "+response.getStatus());
                         Log.e(TAG,"Response Status: "+response.getHeaders());
                         try {
-                            Log.v(TAG,"Bing Image "+example.getD().getResults().get(0).getMediaUrl());
-                            currentCard.previewImg = example.getD().getResults().get(0).getMediaUrl();
-                            currentCard.bannerImg = example.getD().getResults().get(1).getMediaUrl();
+                            Log.v(TAG,"Bing Image "+ classD.getD().getResults().get(0).getMediaUrl());
+                            currentCard.previewImg = classD.getD().getResults().get(0).getMediaUrl();
+                            currentCard.bannerImg = classD.getD().getResults().get(1).getMediaUrl();
 
                         } catch (Exception e) {
                             e.printStackTrace();
