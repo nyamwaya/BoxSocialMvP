@@ -108,7 +108,13 @@ public class SocialAdapter extends RecyclerView.Adapter<SocialAdapter.MyViewhold
     public void onBindViewHolder(final MyViewholder holder, int position) {
 
         if(position==0){
-            Picasso.with(context).load(IMG_ENDPOINT +imgPath).error(R.drawable.ic_book_black_48dp).into(holder.bannerImage);
+            if(imgPath!=null && !imgPath.contains("http:")) {
+
+                Picasso.with(context).load(IMG_ENDPOINT + imgPath).error(R.drawable.ic_book_black_48dp).into(holder.bannerImage);
+            }else{
+                Picasso.with(context).load(imgPath).error(R.drawable.ic_book_black_48dp).into(holder.bannerImage);
+
+            }
         }
         if(position==1){
 

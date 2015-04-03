@@ -11,7 +11,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
-        <!-- laisser ça si on veut des animations -->
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -43,7 +42,7 @@
                 android:paddingRight="6dp"
                 android:paddingLeft="120dip"
                 android:paddingTop="3dip"
-                android:visibility="invisible">
+                android:visibility="visible">
 
                 <com.example.administrator.boxsocialmvp.Utils.TypefacedText
                     android:id="@+id/showTime"
@@ -100,7 +99,7 @@
                     android:paddingLeft="10dip"
                     android:text="titre"
                     android:textColor="@android:color/white"
-                    android:textSize="22sp"
+                    android:textSize="16sp"
                     ttf:typeface="RobotoCondensed-Regular.ttf" />
 
                 <LinearLayout

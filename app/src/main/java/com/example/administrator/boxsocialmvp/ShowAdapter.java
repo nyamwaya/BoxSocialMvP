@@ -51,13 +51,29 @@ public class ShowAdapter extends RecyclerView.Adapter<ShowAdapter.MyViewholder> 
     public void onBindViewHolder(MyViewholder myViewholder, int position) {
         final TvCard current = tvCards.get(position);
         myViewholder.showtitle.setText(current.showTitle);
-        myViewholder.showtime.setText("");
+
+        if(current.network!=null && !current.network.equalsIgnoreCase(""))
+        myViewholder.showNetwork.setText(current.network);
+        else
         myViewholder.showNetwork.setText("");
+
+        if(current.showTime!=null && !current.network.equalsIgnoreCase("")) {
+//            myViewholder.showNetwork.setText(current.network + " " + current.showTime);
+            myViewholder.showtime.setText(current.showTime);
+
+        }
+
         myViewholder.chatter.setText(current.chatter);
         myViewholder.chatter.setTextColor(Color.parseColor("#FFA500"));
         Log.e("SHOWADAPTER", "ImgUrl:" + current.previewImg);
-        Picasso.with(context).load(IMG_ENDPOINT +current.previewImg).error(R.drawable.ic_book_black_48dp).into(myViewholder.showImg);
-        Picasso.with(context).load(IMG_ENDPOINT +current.bannerImg).into(myViewholder.bannerImg);
+        if(current.previewImg!=null && !current.previewImg.contains("http:")) {
+            Picasso.with(context).load(IMG_ENDPOINT + current.previewImg).error(R.drawable.ic_book_black_48dp).into(myViewholder.showImg);
+            Picasso.with(context).load(IMG_ENDPOINT + current.bannerImg).into(myViewholder.bannerImg);
+        }else if(current.previewImg!=null && current.previewImg.contains("http:")){
+            Picasso.with(context).load(current.previewImg).error(R.drawable.ic_book_black_48dp).into(myViewholder.showImg);
+            Picasso.with(context).load(current.bannerImg).into(myViewholder.bannerImg);
+
+        }
         myViewholder.chatter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

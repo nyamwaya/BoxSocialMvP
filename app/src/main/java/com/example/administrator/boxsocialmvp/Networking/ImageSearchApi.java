@@ -17,8 +17,9 @@ public interface ImageSearchApi {
 
     @GET("/customsearch/v1")
     public void getImages(
+            @Query("searchType") String searchType,
             @Query("key") String key,
             @Query("cx") String customId,
             @Query("q") String search,
-            Callback<List<Image>> response);
+            Callback<Image> response);
 }

@@ -2,10 +2,7 @@ package com.example.administrator.boxsocialmvp;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
@@ -13,31 +10,40 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.Html;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
-import android.widget.Switch;
 import android.widget.TextView;
 
-import com.example.administrator.boxsocialmvp.Networking.AiringToday;
+import com.example.administrator.boxsocialmvp.Networking.BingImageSearchApi;
 import com.example.administrator.boxsocialmvp.Networking.ImageSearchApi;
-import com.example.administrator.boxsocialmvp.Networking.OnTheAir;
+import com.example.administrator.boxsocialmvp.Networking.NbaListingsApi;
 import com.example.administrator.boxsocialmvp.Networking.PopularApi;
-import com.example.administrator.boxsocialmvp.Networking.TopRatedShowsApi;
+import com.example.administrator.boxsocialmvp.Networking.SportsTodayApi;
+import com.example.administrator.boxsocialmvp.Objects.AllSportsToday;
 import com.example.administrator.boxsocialmvp.Objects.BoxSocialConstants;
+import com.example.administrator.boxsocialmvp.Objects.D;
+import com.example.administrator.boxsocialmvp.Objects.Example;
 import com.example.administrator.boxsocialmvp.Objects.Image;
+import com.example.administrator.boxsocialmvp.Objects.NbaListings;
+import com.example.administrator.boxsocialmvp.Objects.TodaysSports;
 import com.example.administrator.boxsocialmvp.Objects.TvShow;
+import com.squareup.okhttp.OkHttpClient;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 import retrofit.Callback;
+import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
+import retrofit.client.OkClient;
 import retrofit.client.Response;
 
 
@@ -53,8 +59,10 @@ public class TvLauncherActivity extends ActionBarActivity
     private RecyclerView rcview;
 
     public static final String SHOW_ENDPOINT = "http://api.themoviedb.org/3" ;
+    public static final String KIMONO_ENDPOINT = "https://www.kimonolabs.com/api" ;
     public static final String GOOGLE_ENDPOINT = "https://www.googleapis.com" ;
-
+    public static final String BING_ENDPOINT = "https://api.datamarket.azure.com" ;
+    public static final String BING_USER_ID = "a07d9fe6-17f0-4e53-b993-31f3d767ccb9";
 
     private CharSequence mTitle;
     private ShowAdapter adapter;
@@ -63,33 +71,142 @@ public class TvLauncherActivity extends ActionBarActivity
     private int selectedItem = 1;
     private TextView titleTop;
 
-    public void requestImage(String imageSearch) {
+    public void requestImage(String imageSearch, final TvCard currentCard) {
         RestAdapter restAdapter = new RestAdapter.Builder()
                 .setEndpoint(GOOGLE_ENDPOINT)
                 .build();
         ImageSearchApi searchApi = restAdapter.create(ImageSearchApi.class);
-        searchApi.getImages(getResources().getString(R.string.custom_search_api_key),
+        searchApi.getImages("image",
+                getResources().getString(R.string.custom_search_android_api_key),
                 getResources().getString(R.string.custom_search_id),
                 imageSearch,
 
-        new Callback<List<Image>>() {
+        new Callback<Image>() {
             @Override
-            public void success(List<Image> images, Response response) {
-                Image img = images.get(0);
-                Image imgPojo = new Image();
-                if(img.getLink()!=null && !img.getLink().equalsIgnoreCase("")) {
-                    imgPojo.setLink(img.getLink());
-                    TvLauncherActivity.this.image.add(imgPojo);
+            public void success(Image images, Response response) {
 
-                }
+
+                   Image.Items item1 = images.getItems().get(1);
+                   currentCard.previewImg = item1.getLink();
+
+                   Image.Items item2 = images.getItems().get(2);
+                   currentCard.bannerImg = item2.getLink();
+
+
+
             }
 
             @Override
             public void failure(RetrofitError error) {
                 error.printStackTrace();
+
                 Log.e("GOOGLE ERROR", error.getMessage());
+
+                try {
+                    Log.e(TAG,error.toString());
+                    Log.e(TAG,error.getUrl());
+                    Log.e(TAG, error.getResponse().toString());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
             }
         });
+    }
+    public void requestBingImage(String imageSearch, final TvCard currentCard) {
+
+        RestAdapter.Builder builder = new RestAdapter.Builder()
+                .setEndpoint(BING_ENDPOINT)
+                .setClient(new OkClient(new OkHttpClient()));
+
+        final String credentials = getResources().getString(R.string.bing_search_key) + ":" + getResources().getString(R.string.bing_search_key);
+
+        builder.setRequestInterceptor(new RequestInterceptor() {
+            @Override
+            public void intercept(RequestFacade request) {
+                // create Base64 encodet string
+                String string = "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                request.addHeader("Authorization", string);
+            }
+        });
+        RestAdapter adapter = builder.build();
+        BingImageSearchApi searchApi = adapter.create(BingImageSearchApi.class);
+        searchApi.getImages("'"+imageSearch+"'","json",
+                new Callback<Example>() {
+                    @Override
+                    public void success(Example example, Response response) {
+                        Log.e(TAG,"Response: "+response.getReason());
+                        Log.e(TAG,"Response Url: "+response.getUrl());
+                        Log.e(TAG,"Response Status: "+response.getStatus());
+                        Log.e(TAG,"Response Status: "+response.getHeaders());
+                        try {
+                            Log.v(TAG,"Bing Image "+example.getD().getResults().get(0).getMediaUrl());
+                            currentCard.previewImg = example.getD().getResults().get(0).getMediaUrl();
+                            currentCard.bannerImg = example.getD().getResults().get(1).getMediaUrl();
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+
+
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        Log.e(TAG,error.toString());
+                        Log.e(TAG, error.getMessage());
+                        Log.e(TAG, error.getUrl());
+                        Log.e(TAG, error.getLocalizedMessage());
+                        error.printStackTrace();
+                    }
+                });
+    }
+
+    public void getNbaListings(){
+        RestAdapter restAdapter = new RestAdapter.Builder()
+                .setEndpoint(KIMONO_ENDPOINT)
+                .build();
+        NbaListingsApi nbaListingsApi = restAdapter.create(NbaListingsApi.class);
+        nbaListingsApi.getBballListings(getResources().getString(R.string.nba_listings_api_key),
+                new Callback<NbaListings>() {
+                    @Override
+                    public void success(NbaListings nbaListings, Response response) {
+                        loopNbaData(nbaListings);
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        error.printStackTrace();
+                        Log.e(TAG, error.toString());
+                        Log.e(TAG, error.getMessage());
+                        Log.e(TAG, error.getUrl());
+                        Log.e(TAG, error.getLocalizedMessage());
+
+
+
+                    }
+                });
+    }
+    public void getTodaysSports(){
+        RestAdapter restAdapter = new RestAdapter.Builder()
+                .setEndpoint(KIMONO_ENDPOINT)
+                .build();
+        SportsTodayApi sportsTodayApiApi = restAdapter.create(SportsTodayApi.class);
+        sportsTodayApiApi.getTodaysSports(getResources().getString(R.string.nba_listings_api_key),
+                new Callback<AllSportsToday>() {
+
+
+                    @Override
+                    public void success(AllSportsToday allSportsToday, Response response) {
+                        loopSportsData(allSportsToday);
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        error.printStackTrace();
+                    }
+                });
     }
 
     public void requestData(int i){
@@ -161,6 +278,9 @@ public class TvLauncherActivity extends ActionBarActivity
                             }
                         });
                 break;
+            case 4:
+                getTodaysSports();
+                break;
             default:
                 apiService.getShows(getResources().getString(R.string.imdb_key_id),
                         "1",
@@ -199,7 +319,70 @@ public class TvLauncherActivity extends ActionBarActivity
             adapter.notifyDataSetChanged();
         }
     }
+   private void loopNbaData(NbaListings nbaGames){
+       data.clear();
+       for(int i = 0; i<nbaGames.getResults().getCollection1().size(); i++){
+          NbaListings.Collection1 nbaGame = nbaGames.getResults().getCollection1().get(i);
+          TvCard currentCard = new TvCard();
+           Log.e("ShowsDATA: ", nbaGame.getGame().getText());
+           currentCard.showTitle  = nbaGame.getDescription();
+           currentCard.chatter = "CHATTER";
+           currentCard.network = nbaGame.getNetwork();
+           currentCard.showTime = nbaGame.getDay()+" "+nbaGame.getDate()+" "+nbaGame.getShow_time();
+           try {
+               requestImage(nbaGame.getGame().getText().replace("NBA Basketball: ",""),currentCard);
 
+           } finally {
+               data.add(currentCard);
+
+           }
+       }
+       if(adapter!=null){
+           adapter.notifyDataSetChanged();
+       }
+   }
+
+   private void loopSportsData(AllSportsToday todaysSports){
+       data.clear();
+       for(int i = 0; i<todaysSports.getResults().getCollection2().size(); i++){
+           AllSportsToday.Collection2 sport = todaysSports.getResults().getCollection2().get(i);
+
+
+          TvCard currentCard = new TvCard();
+           if(sport.getSport_type().equalsIgnoreCase("NBA Basketball")||
+                   sport.getSport_type().equalsIgnoreCase("MLB Preseason Baseball")||
+                   sport.getSport_type().equalsIgnoreCase("NHL Hockey")||
+                   sport.getSport_type().equalsIgnoreCase("UEFA Europa League Soccer")||
+                   sport.getSport_type().equalsIgnoreCase("English Premier League Soccer")||
+                   sport.getSport_type().equalsIgnoreCase("2015 NCAA Basketball Tournament")
+                   ) {
+               if(sport.getShow_type().toLowerCase().contains("live")) {
+                   Log.e("ShowsDATA: ", sport.getGame_title());
+                   currentCard.showTitle = sport.getGame_title();
+                   currentCard.chatter = "CHATTER";
+                   currentCard.network = sport.getNetwork()+" - "+sport.getSport_type();
+                   currentCard.showTime = sport.getStart_time() + " " + sport.getShow_type();
+
+
+                   try {
+                       requestBingImage(sport.getGame_title(), currentCard);
+                   } finally {
+                       data.add(currentCard);
+
+                   }
+               }
+
+           }
+
+
+       }
+           long seed = System.nanoTime();
+           Collections.shuffle(data, new Random(seed));
+           if (adapter != null) {
+               adapter.notifyDataSetChanged();
+           }
+
+   }
 
     public static List<TvCard> getSampleData(){
         List<TvCard> sampleData = new ArrayList<>();
@@ -207,7 +390,7 @@ public class TvLauncherActivity extends ActionBarActivity
         String[] network = {"ABC","NBC","HBO","CBS"};
         String[] times = {"7:00 PM EST","9:00 PM EST","8:00 PM EST","LIVE NOW"};
         String[] chatter = {"CHATTER","CHATTER","CHATTER","CHATTER"};
-        String[] imgUrls = {"http://upload.wikimedia.org/wikipedia/en/0/09/Agents_of_SHIELD_season_1_poster.jpeg",
+        String[] imgUrls = {"http://upload.wikimedia.org/wikipedia/en/0/ 09/Agents_of_SHIELD_season_1_poster.jpeg",
                 "http://upload.wikimedia.org/wikipedia/en/3/30/Hannibal_Season_2_promtional_poster.jpg",
                 "http://ia.media-imdb.com/images/M/MV5BMTk0NDg4NjQ5N15BMl5BanBnXkFtZTgwMzkzNTgyMTE@._V1_SX214_AL_.jpg",
                 "http://d236bkdxj385sg.cloudfront.net/wp-content/uploads/2015/01/empire-ad.jpg"};
@@ -314,6 +497,13 @@ public class TvLauncherActivity extends ActionBarActivity
                 break;
             case 3:
                 mTitle = getString(R.string.title_section4);
+                titleTop.setText(mTitle);
+
+                requestData(number);
+
+                break;
+            case 4:
+                mTitle = getString(R.string.title_section5);
                 titleTop.setText(mTitle);
 
                 requestData(number);
