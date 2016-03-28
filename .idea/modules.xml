@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/BoxSocialMvP.iml" filepath="$PROJECT_DIR$/BoxSocialMvP.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SocialBoxMVP.iml" filepath="$PROJECT_DIR$/SocialBoxMVP.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
 </project>
-
