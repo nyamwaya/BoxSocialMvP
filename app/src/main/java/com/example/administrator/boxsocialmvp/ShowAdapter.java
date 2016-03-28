@@ -48,33 +48,50 @@ public class ShowAdapter extends RecyclerView.Adapter<ShowAdapter.MyViewholder> 
 
 
     @Override
-    public void onBindViewHolder(MyViewholder myViewholder, int position) {
+    public void onBindViewHolder(MyViewholder holder, int position) {
         final TvCard current = tvCards.get(position);
-        myViewholder.showtitle.setText(current.showTitle);
+        holder.showtitle.setText(current.showTitle);
 
-        if(current.network!=null && !current.network.equalsIgnoreCase(""))
-        myViewholder.showNetwork.setText(current.network);
+        Picasso.with(context)
+                .load(IMG_ENDPOINT + current.bannerImg)
+                .into(holder.bannerImg);
+
+        holder.mView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context,SocialActivity.class);
+                intent.putExtra("show",current);
+                IntentUtils.startPreviewActivity(context, intent);
+//                context.overridePendingTransition(R.anim.in_from_right,R.anim.out_to_left);
+
+            }
+        });
+
+      /*  if(current.network!=null && !current.network.equalsIgnoreCase(""))
+        holder.showNetwork.setText(current.network);
         else
-        myViewholder.showNetwork.setText("");
-
+        //holder.showNetwork.setText("");
+*/
+/*
         if(current.showTime!=null && !current.network.equalsIgnoreCase("")) {
-//            myViewholder.showNetwork.setText(current.network + " " + current.showTime);
-            myViewholder.showtime.setText(current.showTime);
+//            holder.showNetwork.setText(current.network + " " + current.showTime);
+            holder.showtime.setText(current.showTime);
 
         }
+*/
 
-        myViewholder.chatter.setText(current.chatter);
-        myViewholder.chatter.setTextColor(Color.parseColor("#FFA500"));
+    /*    holder.chatter.setText(current.chatter);
+        holder.chatter.setTextColor(Color.parseColor("#FFA500"));
         Log.e("SHOWADAPTER", "ImgUrl:" + current.previewImg);
         if(current.previewImg!=null && !current.previewImg.contains("http:")) {
-            Picasso.with(context).load(IMG_ENDPOINT + current.previewImg).error(R.drawable.ic_book_black_48dp).into(myViewholder.showImg);
-            Picasso.with(context).load(IMG_ENDPOINT + current.bannerImg).into(myViewholder.bannerImg);
+            Picasso.with(context).load(IMG_ENDPOINT + current.previewImg).error(R.drawable.ic_book_black_48dp).into(holder.showImg);
+            Picasso.with(context).load(IMG_ENDPOINT + current.bannerImg).into(holder.bannerImg);
         }else if(current.previewImg!=null && current.previewImg.contains("http:")){
-            Picasso.with(context).load(current.previewImg).error(R.drawable.ic_book_black_48dp).into(myViewholder.showImg);
-            Picasso.with(context).load(current.bannerImg).into(myViewholder.bannerImg);
+            Picasso.with(context).load(current.previewImg).error(R.drawable.ic_book_black_48dp).into(holder.showImg);
+            Picasso.with(context).load(current.bannerImg).into(holder.bannerImg);
 
         }
-        myViewholder.chatter.setOnClickListener(new View.OnClickListener() {
+        holder.chatter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context,SocialActivity.class);
@@ -82,7 +99,7 @@ public class ShowAdapter extends RecyclerView.Adapter<ShowAdapter.MyViewholder> 
                 IntentUtils.startPreviewActivity(context, intent);
 //                context.overridePendingTransition(R.anim.in_from_right,R.anim.out_to_left);
             }
-        });
+        });*/
 
     }
 
@@ -99,9 +116,11 @@ public class ShowAdapter extends RecyclerView.Adapter<ShowAdapter.MyViewholder> 
         TextView chatter;
         ImageView showImg;
         ImageView bannerImg;
+        public final View mView;
 
         public MyViewholder(View itemView) {
             super(itemView);
+            mView = itemView;
             showtime = (TextView) itemView.findViewById(R.id.showTime);
             showtitle = (TextView) itemView.findViewById(R.id.showTitle);
             showNetwork = (TextView) itemView.findViewById(R.id.showNetwork);
